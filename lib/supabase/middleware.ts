@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { DEV_AUTH_COOKIE } from "@/lib/auth/dev-credentials";
 
 function missingConfigHtml(): string {
   return `<!DOCTYPE html>
@@ -23,6 +24,17 @@ function missingConfigHtml(): string {
 export async function updateSession(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isApi = path.startsWith("/api");
+  const isAuthPath = path.startsWith("/login") || path.startsWith("/auth");
+  const hasDevSession = request.cookies.get(DEV_AUTH_COOKIE)?.value === "1";
+
+  if (hasDevSession) {
+    if (path.startsWith("/login")) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next({ request });
+  }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -66,8 +78,6 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const isAuthPath = path.startsWith("/login") || path.startsWith("/auth");
 
   if (!user && !isAuthPath && !isApi) {
     const url = request.nextUrl.clone();
