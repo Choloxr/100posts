@@ -7,6 +7,32 @@ import { DEV_AUTH_COOKIE } from "@/lib/auth/dev-credentials";
 export default async function HomePage() {
   const cookieStore = await cookies();
   const hasDevSession = cookieStore.get(DEV_AUTH_COOKIE)?.value === "1";
+  const hasSupabaseEnv =
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
+  if (hasDevSession && !hasSupabaseEnv) {
+    return (
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Sesion temporal activa</h1>
+          <p className="mt-2 max-w-xl text-sm text-[var(--muted)]">
+            Ya podés entrar con usuario/contraseña. Para habilitar generación y datos reales,
+            cargá `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` en Vercel.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/products/new"
+            className="inline-flex items-center justify-center rounded-lg bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-fg)] hover:opacity-90"
+          >
+            Nuevo producto (demo)
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   const supabase = await createClient();
   const {
     data: { user },

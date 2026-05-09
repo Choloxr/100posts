@@ -9,6 +9,29 @@ import { parseVisualProfile, defaultModesFromProfile } from "@/lib/visual/profil
 export default async function NewProductPage() {
   const cookieStore = await cookies();
   const hasDevSession = cookieStore.get(DEV_AUTH_COOKIE)?.value === "1";
+  const hasSupabaseEnv =
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
+  if (hasDevSession && !hasSupabaseEnv) {
+    return (
+      <div className="mx-auto max-w-lg space-y-6">
+        <div>
+          <Link
+            href="/"
+            className="text-xs font-medium text-[var(--muted)] hover:text-[var(--fg)]"
+          >
+            ← Inicio
+          </Link>
+          <h1 className="mt-2 text-xl font-semibold">Modo temporal</h1>
+          <p className="mt-1 text-sm text-[var(--muted)]">
+            Cargá variables de Supabase en Vercel para habilitar guardado y generación real.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
