@@ -28,11 +28,8 @@ export async function updateSession(request: NextRequest) {
   const hasDevSession = request.cookies.get(DEV_AUTH_COOKIE)?.value === "1";
 
   if (hasDevSession) {
-    if (path.startsWith("/login")) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/";
-      return NextResponse.redirect(url);
-    }
+    // In temporary credential mode, let server components decide what to render.
+    // Redirecting /login -> / can create loops with pages that still check Supabase user.
     return NextResponse.next({ request });
   }
 
