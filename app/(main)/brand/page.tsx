@@ -51,6 +51,7 @@ export default function BrandPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [devMode, setDevMode] = useState(false);
   const [storeName, setStoreName] = useState("");
   const [primaryColor, setPrimaryColor] = useState("#0f172a");
   const [secondaryColor, setSecondaryColor] = useState("#6366f1");
@@ -73,7 +74,10 @@ export default function BrandPage() {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) {
-        router.push("/login");
+        if (!cancelled) {
+          setDevMode(true);
+          setLoading(false);
+        }
         return;
       }
       const { data } = await supabase
@@ -118,7 +122,9 @@ export default function BrandPage() {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-      router.push("/login");
+      setSaving(false);
+      setDevMode(true);
+      alert("Modo temporal activo: para guardar marca necesitás iniciar con Supabase.");
       return;
     }
 
@@ -155,6 +161,18 @@ export default function BrandPage() {
 
   if (loading) {
     return <p className="text-sm text-[var(--muted)]">Cargando…</p>;
+  }
+
+  if (devMode) {
+    return (
+      <div className="mx-auto max-w-2xl space-y-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5">
+        <h1 className="text-xl font-semibold">Marca (modo temporal)</h1>
+        <p className="text-sm text-[var(--muted)]">
+          Entraste con usuario/contraseña temporal. Esta sección requiere sesión real de Supabase
+          para guardar datos.
+        </p>
+      </div>
+    );
   }
 
   return (

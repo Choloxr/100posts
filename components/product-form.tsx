@@ -68,7 +68,7 @@ export function ProductForm({
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) {
-        router.push("/login");
+        setMsg("Modo temporal activo: para generar necesitás sesión real de Supabase.");
         return;
       }
 
