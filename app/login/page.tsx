@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -29,45 +28,71 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--bg)] px-4">
-      <div className="w-full max-w-sm rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-sm">
-        <h1 className="text-lg font-semibold text-[var(--fg)]">100posts</h1>
-        <p className="mt-1 text-sm text-[var(--muted)]">
-          Ingresá con enlace mágico (sin contraseña).
-        </p>
-        <form onSubmit={sendLink} className="mt-6 space-y-3">
-          <label className="block text-xs font-medium text-[var(--muted)]">
-            Email
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm text-[var(--fg)] outline-none ring-[var(--accent)] focus:ring-2"
-              placeholder="vos@tutienda.com"
-            />
-          </label>
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-[var(--accent)] py-2.5 text-sm font-medium text-[var(--accent-fg)] hover:opacity-90"
-          >
-            Enviar enlace
-          </button>
-        </form>
-        {message ? (
-          <p
-            className={`mt-3 text-sm ${status === "error" ? "text-red-500" : "text-[var(--muted)]"}`}
-          >
-            {message}
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-slate-950 px-4 py-12">
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(99,102,241,0.35),transparent)]"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_100%,rgba(14,165,233,0.12),transparent_50%)]"
+        aria-hidden
+      />
+
+      <div className="relative z-10 w-full max-w-md">
+        <div className="mb-8 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300/90">
+            100posts
           </p>
-        ) : null}
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+            Carruseles que venden
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-slate-400 sm:text-base">
+            Para tiendas de celulares. Tres estilos, marca coherente, listo para Instagram
+            en un clic.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-6 shadow-2xl shadow-indigo-950/50 backdrop-blur-md sm:p-8">
+          <h2 className="text-sm font-medium text-slate-200">Entrá con tu correo</h2>
+          <p className="mt-1 text-xs text-slate-500">
+            Te enviamos un enlace mágico. Sin contraseña.
+          </p>
+          <form onSubmit={sendLink} className="mt-6 space-y-4">
+            <label className="block text-xs font-medium text-slate-400">
+              Email
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1.5 w-full rounded-xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 outline-none ring-2 ring-transparent transition placeholder:text-slate-600 focus:border-indigo-500/50 focus:ring-indigo-500/30"
+                placeholder="vos@tutienda.com"
+                autoComplete="email"
+              />
+            </label>
+            <button
+              type="submit"
+              className="w-full rounded-xl bg-indigo-500 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400 active:scale-[0.99]"
+            >
+              Enviar enlace
+            </button>
+          </form>
+          {message ? (
+            <p
+              className={`mt-4 text-sm ${status === "error" ? "text-red-400" : "text-slate-400"}`}
+            >
+              {message}
+            </p>
+          ) : null}
+        </div>
+
+        <p className="mt-8 text-center text-xs text-slate-600">
+          Al continuar aceptás cookies de sesión.{" "}
+          <span className="text-slate-500">
+            (Si ves una pantalla de “configuración”, faltan variables en Vercel.)
+          </span>
+        </p>
       </div>
-      <p className="mt-6 text-center text-xs text-[var(--muted)]">
-        Al continuar aceptás el uso de cookies de sesión.{" "}
-        <Link href="/" className="underline">
-          Volver
-        </Link>
-      </p>
     </div>
   );
 }
