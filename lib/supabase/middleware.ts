@@ -1,6 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { DEV_AUTH_COOKIE } from "@/lib/auth/dev-credentials";
 
 function missingConfigHtml(): string {
   return `<!DOCTYPE html>
@@ -25,28 +24,6 @@ export async function updateSession(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isApi = path.startsWith("/api");
   const isAuthPath = path.startsWith("/login") || path.startsWith("/auth");
-  const hasDevSession = request.cookies.get(DEV_AUTH_COOKIE)?.value === "1";
-  const hasSupabaseEnv =
-    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
-    Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-
-  if (hasDevSession) {
-    // In temporary credential mode, let server components decide what to render.
-    // Redirecting /login -> / can create loops with pages that still check Supabase user.
-    if (
-      !hasSupabaseEnv &&
-      path !== "/" &&
-      path !== "/login" &&
-      path !== "/products/new" &&
-      path !== "/api/dev-login" &&
-      path !== "/api/dev-logout"
-    ) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/";
-      return NextResponse.redirect(url);
-    }
-    return NextResponse.next({ request });
-  }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

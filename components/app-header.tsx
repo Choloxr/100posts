@@ -10,7 +10,6 @@ export function AppHeader() {
   const toggle = useThemeStore((s) => s.toggle);
 
   async function signOut() {
-    await fetch("/api/dev-logout", { method: "POST" });
     const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/login");

@@ -1,29 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "sent" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [hasAuthError, setHasAuthError] = useState(false);
 
-  async function signIn(e: React.FormEvent) {
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setHasAuthError(params.get("error") === "auth");
+  }, []);
+
+  async function sendMagicLink(e: React.FormEvent) {
     e.preventDefault();
     setStatus("loading");
     setMessage("");
-    const response = await fetch("/api/dev-login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+    const supabase = createClient();
+    const origin = window.location.origin;
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: `${origin}/auth/callback` },
     });
-    if (!response.ok) {
-      const body = (await response.json().catch(() => null)) as { error?: string } | null;
+    if (error) {
       setStatus("error");
-      setMessage(body?.error ?? "No se pudo iniciar sesión.");
+      setMessage(error.message);
       return;
     }
-    window.location.href = "/";
+    setStatus("sent");
+    setMessage("Revisá tu email, te enviamos un link de acceso");
   }
 
   return (
@@ -52,31 +59,26 @@ export default function LoginPage() {
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-6 shadow-2xl shadow-indigo-950/50 backdrop-blur-md sm:p-8">
-          <h2 className="text-sm font-medium text-slate-200">Iniciar sesión</h2>
-          <p className="mt-1 text-xs text-slate-500">Acceso temporal con usuario y contraseña.</p>
-          <form onSubmit={signIn} className="mt-6 space-y-4">
+          <h2 className="text-sm font-medium text-slate-200">Entrá con tu email</h2>
+          <p className="mt-1 text-xs text-slate-500">
+            Te enviamos un link de acceso. Sin contraseña.
+          </p>
+          {hasAuthError ? (
+            <p className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+              El enlace venció o no es válido. Pedí uno nuevo.
+            </p>
+          ) : null}
+          <form onSubmit={(e) => void sendMagicLink(e)} className="mt-6 space-y-4">
             <label className="block text-xs font-medium text-slate-400">
-              Usuario
+              Email
               <input
-                type="text"
+                type="email"
                 required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="mt-1.5 w-full rounded-xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 outline-none ring-2 ring-transparent transition placeholder:text-slate-600 focus:border-indigo-500/50 focus:ring-indigo-500/30"
-                placeholder="cholo"
-                autoComplete="username"
-              />
-            </label>
-            <label className="block text-xs font-medium text-slate-400">
-              Contraseña
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 outline-none ring-2 ring-transparent transition placeholder:text-slate-600 focus:border-indigo-500/50 focus:ring-indigo-500/30"
-                placeholder="••••••••"
-                autoComplete="current-password"
+                placeholder="vos@tutienda.com"
+                autoComplete="email"
               />
             </label>
             <button
@@ -84,7 +86,7 @@ export default function LoginPage() {
               disabled={status === "loading"}
               className="w-full rounded-xl bg-indigo-500 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {status === "loading" ? "Ingresando..." : "Ingresar"}
+              {status === "loading" ? "Enviando…" : "Enviar link de acceso"}
             </button>
           </form>
           {message ? (
