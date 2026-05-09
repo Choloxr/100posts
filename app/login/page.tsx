@@ -1,15 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "sent" | "error">("idle");
+  const [otp, setOtp] = useState("");
+  const [status, setStatus] = useState<"idle" | "sent" | "error" | "verifying">("idle");
   const [message, setMessage] = useState("");
+  const [hasAuthError, setHasAuthError] = useState(false);
+  const [cooldownSec, setCooldownSec] = useState(0);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setHasAuthError(params.get("error") === "auth");
+  }, []);
+
+  useEffect(() => {
+    if (cooldownSec <= 0) return;
+    const timer = window.setInterval(() => {
+      setCooldownSec((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [cooldownSec]);
 
   async function sendLink(e: React.FormEvent) {
     e.preventDefault();
+    if (cooldownSec > 0) {
+      setStatus("error");
+      setMessage(`Esperá ${cooldownSec}s antes de pedir otro email.`);
+      return;
+    }
     setStatus("idle");
     setMessage("");
     const supabase = createClient();
@@ -20,11 +41,35 @@ export default function LoginPage() {
     });
     if (error) {
       setStatus("error");
+      if (error.message.toLowerCase().includes("rate limit")) {
+        setCooldownSec(60);
+        setMessage("Llegaste al límite de envíos. Esperá 60s y volvé a intentar.");
+        return;
+      }
       setMessage(error.message);
       return;
     }
+    setCooldownSec(60);
     setStatus("sent");
-    setMessage("Revisá tu correo para el enlace mágico.");
+    setMessage("Revisá tu correo. Podés entrar desde el enlace o pegar el código de 6 dígitos.");
+  }
+
+  async function verifyCode(e: React.FormEvent) {
+    e.preventDefault();
+    setStatus("verifying");
+    setMessage("");
+    const supabase = createClient();
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: otp.trim(),
+      type: "email",
+    });
+    if (error) {
+      setStatus("error");
+      setMessage(error.message);
+      return;
+    }
+    window.location.href = "/";
   }
 
   return (
@@ -55,8 +100,13 @@ export default function LoginPage() {
         <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-6 shadow-2xl shadow-indigo-950/50 backdrop-blur-md sm:p-8">
           <h2 className="text-sm font-medium text-slate-200">Entrá con tu correo</h2>
           <p className="mt-1 text-xs text-slate-500">
-            Te enviamos un enlace mágico. Sin contraseña.
+            Te enviamos un enlace o código de acceso. Sin contraseña.
           </p>
+          {hasAuthError ? (
+            <p className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+              El enlace/código venció o no es válido. Pedí uno nuevo e intentá otra vez.
+            </p>
+          ) : null}
           <form onSubmit={sendLink} className="mt-6 space-y-4">
             <label className="block text-xs font-medium text-slate-400">
               Email
@@ -72,9 +122,34 @@ export default function LoginPage() {
             </label>
             <button
               type="submit"
-              className="w-full rounded-xl bg-indigo-500 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400 active:scale-[0.99]"
+              disabled={cooldownSec > 0}
+              className="w-full rounded-xl bg-indigo-500 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Enviar enlace
+              {cooldownSec > 0 ? `Reenviar en ${cooldownSec}s` : "Enviar enlace"}
+            </button>
+          </form>
+          <form onSubmit={verifyCode} className="mt-4 space-y-3">
+            <label className="block text-xs font-medium text-slate-400">
+              Código de 6 dígitos
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]{6}"
+                minLength={6}
+                maxLength={6}
+                required
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                className="mt-1.5 w-full rounded-xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm tracking-[0.35em] text-slate-100 outline-none ring-2 ring-transparent transition placeholder:text-slate-600 focus:border-indigo-500/50 focus:ring-indigo-500/30"
+                placeholder="123456"
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={!email || otp.length !== 6 || status === "verifying"}
+              className="w-full rounded-xl border border-white/15 bg-slate-800 py-3 text-sm font-semibold text-slate-100 transition hover:bg-slate-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Validar código
             </button>
           </form>
           {message ? (
