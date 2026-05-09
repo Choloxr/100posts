@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 100posts (MVP)
 
-## Getting Started
+Next.js + Supabase + OpenAI + fal.ai: tres variantes de carrusel Instagram (4:5) para **tiendas de celulares**, con caption y CTA.
 
-First, run the development server:
+## Requisitos locales
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Supabase**: proyecto nuevo → SQL Editor → ejecutá en orden:
+   - [`supabase/migrations/20250508000000_init.sql`](supabase/migrations/20250508000000_init.sql)
+   - [`supabase/migrations/20250509120000_modes_visual.sql`](supabase/migrations/20250509120000_modes_visual.sql) (si ya tenías el MVP viejo: renombra columnas y agrega `visual_profile`).
+   Si el `INSERT` en `storage.buckets` falla por permisos, creá a mano los buckets `product-images` y `generated-assets` (privados) y dejá las políticas del SQL que apliquen a `storage.objects`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Auth**: en Authentication → URL configuration, agregá `http://localhost:3000/auth/callback` (y la URL de producción equivalente en Vercel).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Variables**: copiá [`.env.example`](.env.example) a `.env.local` y completá:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY` (opcional en este MVP; reservado para scripts/admin)
+   - `OPENAI_API_KEY`
+   - `FAL_KEY` ([fal.ai](https://fal.ai) dashboard)
+   - Opcional: `ENABLE_PRODUCT_ENHANCEMENT=true` (remove background vía fal en el hero del producto)
 
-## Learn More
+4. `npm install` y `npm run dev`.
 
-To learn more about Next.js, take a look at the following resources:
+## Vercel
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Conectá el repo, mismo `.env` que en Supabase (pestaña Environment Variables).
+- `OPENAI_API_KEY` y `FAL_KEY` solo en servidor (no `NEXT_PUBLIC_`).
+- Aumentá timeout si hace falta: en `app/api/generate/route.ts` está `maxDuration = 60`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Flujo manual (E2E)
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Magic link desde `/login`.
+2. `/brand`: nombre + colores + tono.
+3. `/products/new`: producto → **Generar 3 posts** (~20–60 s según cola fal/OpenAI).
+4. `/runs/[id]`: preview, copiar caption/CTA, **Descargar ZIP**.
