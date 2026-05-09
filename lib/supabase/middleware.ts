@@ -17,6 +17,7 @@ function missingConfigHtml(): string {
 <p>Para que la app arranque, agregá en <strong>Project → Settings → Environment Variables</strong>:</p>
 <code>NEXT_PUBLIC_SUPABASE_URL<br/>NEXT_PUBLIC_SUPABASE_ANON_KEY</code>
 <p>Luego redeploy. Guía: README del repo.</p>
+<p class="text-xs">En localhost: confirmá que <code>.env.local</code> esté <strong>guardado en disco</strong> (Ctrl+S) junto a <code>package.json</code>. Si el archivo está vacío en disco, Next no verá las variables.</p>
 </div></body></html>`;
 }
 

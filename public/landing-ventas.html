@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>100posts — Posts de Instagram en 60 segundos, sin diseñadores</title>
+<meta name="description" content="Subís la foto de tu celular, la IA genera el post completo (imagen + copy + hashtags) listo para publicar en Instagram. Probá 7 días gratis."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+/* ─── RESET & BASE ───────────────────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#06060a;
+  --bg2:#0d0d14;
+  --bg3:#12121c;
+  --border:rgba(255,255,255,0.07);
+  --border-strong:rgba(255,255,255,0.12);
+  --accent:#7C5CFC;
+  --accent2:#9B82FF;
+  --accent-glow:rgba(124,92,252,0.25);
+  --text:#f0f0f8;
+  --muted:rgba(240,240,248,0.5);
+  --muted2:rgba(240,240,248,0.35);
+  --card:#0e0e18;
+  --card-border:rgba(124,92,252,0.15);
+  --success:#22c55e;
+  --warning:#f59e0b;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;height:auto;display:block}
+
+/* ─── UTILITIES ──────────────────────────────────────────────── */
+.container{max-width:1080px;margin:0 auto;padding:0 1.5rem}
+.section-gap{padding:7rem 0}
+.section-gap-sm{padding:5rem 0}
+.label-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(124,92,252,0.1);border:1px solid rgba(124,92,252,0.25);color:var(--accent2);padding:0.3rem 1rem;border-radius:999px;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:1.25rem}
+.label-tag::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent2);display:inline-block;flex-shrink:0}
+.section-title{font-size:clamp(2rem,4.5vw,3.2rem);font-weight:900;line-height:1.08;letter-spacing:-1.5px;margin-bottom:1rem}
+.section-sub{font-size:1rem;color:var(--muted);max-width:500px;line-height:1.7}
+.highlight{color:var(--accent2)}
+.glow-line{width:80px;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:999px;margin-bottom:2rem}
+
+/* ─── BUTTONS ────────────────────────────────────────────────── */
+.btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:#fff;padding:0.9rem 2.2rem;border-radius:12px;font-size:1rem;font-weight:700;border:none;cursor:pointer;transition:all 0.25s;box-shadow:0 0 0 rgba(124,92,252,0);text-decoration:none;line-height:1}
+.btn-primary:hover{opacity:0.88;box-shadow:0 0 32px var(--accent-glow);transform:translateY(-1px)}
+.btn-primary.lg{font-size:1.15rem;padding:1.1rem 2.8rem;border-radius:14px}
+.btn-secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:transparent;color:var(--text);padding:0.9rem 2rem;border-radius:12px;font-size:1rem;font-weight:600;border:1px solid var(--border-strong);cursor:pointer;transition:all 0.25s;text-decoration:none;line-height:1}
+.btn-secondary:hover{border-color:rgba(124,92,252,0.45);color:var(--accent2)}
+
+/* ─── NAV ────────────────────────────────────────────────────── */
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.1rem 2rem;border-bottom:1px solid var(--border);background:rgba(6,6,10,0.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.logo{font-size:1.25rem;font-weight:900;letter-spacing:-0.5px}
+.logo span{color:var(--accent)}
+.nav-right{display:flex;align-items:center;gap:1rem}
+.nav-link{font-size:0.88rem;font-weight:500;color:var(--muted);transition:color 0.2s}
+.nav-link:hover{color:var(--text)}
+.nav-cta{background:var(--accent);color:#fff;padding:0.5rem 1.3rem;border-radius:8px;font-size:0.88rem;font-weight:700;transition:opacity 0.2s}
+.nav-cta:hover{opacity:0.85}
+
+/* ─── HERO ───────────────────────────────────────────────────── */
+.hero{text-align:center;padding:7rem 1.5rem 5rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(124,92,252,0.15) 0%,transparent 70%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,92,252,0.08);border:1px solid rgba(124,92,252,0.28);color:var(--accent2);padding:0.35rem 1.1rem;border-radius:999px;font-size:0.78rem;font-weight:600;margin-bottom:2rem}
+.hero-badge .dot-pulse{width:6px;height:6px;border-radius:50%;background:var(--accent2);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.85)}}
+.hero h1{font-size:clamp(2.5rem,6.5vw,4.8rem);font-weight:900;line-height:1.04;letter-spacing:-2.5px;margin-bottom:1.5rem;max-width:820px;margin-left:auto;margin-right:auto}
+.hero-sub{font-size:1.15rem;color:var(--muted);max-width:560px;margin:0 auto 2.5rem;line-height:1.75}
+.hero-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.25rem}
+.hero-trust{display:flex;align-items:center;justify-content:center;gap:1.5rem;flex-wrap:wrap;font-size:0.8rem;color:var(--muted2)}
+.hero-trust span{display:flex;align-items:center;gap:5px}
+.hero-trust .ico{font-size:0.9rem}
+
+/* ─── SOCIAL PROOF BAR ───────────────────────────────────────── */
+.social-proof-bar{border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:2rem;text-align:center}
+.social-proof-bar p{font-size:0.82rem;color:var(--muted2);margin-bottom:1.25rem;text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:2.5rem;flex-wrap:wrap}
+.logo-item{font-size:0.92rem;font-weight:700;color:var(--muted2);letter-spacing:-0.3px;transition:color 0.2s}
+.logo-item:hover{color:var(--muted)}
+
+/* ─── PRODUCT MOCKUP ─────────────────────────────────────────── */
+.mockup-section{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.mockup-wrapper{max-width:900px;margin:0 auto;position:relative}
+.mockup-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70%;height:70%;background:radial-gradient(ellipse,rgba(124,92,252,0.18) 0%,transparent 70%);pointer-events:none;z-index:0}
+.mockup-img{position:relative;z-index:1;border-radius:20px;border:1px solid var(--border-strong);box-shadow:0 40px 120px rgba(0,0,0,0.6),0 0 80px rgba(124,92,252,0.15);overflow:hidden}
+.mockup-img img{width:100%;display:block}
+
+/* ─── PAIN POINTS ────────────────────────────────────────────── */
+.pains-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-top:3.5rem}
+.pain-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem 1.75rem;display:flex;align-items:flex-start;gap:1rem;transition:border-color 0.25s}
+.pain-card:hover{border-color:rgba(124,92,252,0.3)}
+.pain-icon{font-size:1.6rem;flex-shrink:0;margin-top:0.05rem}
+.pain-card h3{font-size:0.95rem;font-weight:700;margin-bottom:0.3rem;color:var(--text)}
+.pain-card p{font-size:0.85rem;color:var(--muted);line-height:1.55}
+
+/* ─── ALTERNATING BLOCKS ─────────────────────────────────────── */
+.alt-blocks{display:flex;flex-direction:column;gap:5rem;margin-top:5rem}
+.alt-block{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+.alt-block.reverse .alt-img{order:2}
+.alt-block.reverse .alt-text{order:1}
+.alt-img{border-radius:20px;overflow:hidden;border:1px solid var(--border);background:var(--bg3);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;position:relative}
+.alt-img-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;height:100%;padding:2rem;text-align:center}
+.alt-img-placeholder .big-icon{font-size:4rem;opacity:0.4}
+.alt-img-placeholder p{font-size:0.8rem;color:var(--muted2);font-weight:500}
+.alt-img-glow{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(124,92,252,0.12) 0%,transparent 70%);pointer-events:none}
+.alt-text{}
+.alt-text .label-tag{margin-bottom:1rem}
+.alt-text h3{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;line-height:1.15;letter-spacing:-0.8px;margin-bottom:1rem}
+.alt-text p{font-size:0.95rem;color:var(--muted);line-height:1.75}
+.alt-text .pain-stat{margin-top:1.25rem;display:inline-flex;align-items:center;gap:0.6rem;background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:0.5rem 1rem;border-radius:999px;font-size:0.82rem;color:var(--muted);font-weight:500}
+.alt-text .pain-stat strong{color:var(--text)}
+
+/* ─── BENEFITS ───────────────────────────────────────────────── */
+.benefits-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1.25rem;margin-top:3.5rem}
+.benefit-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:1.75rem;transition:all 0.25s;position:relative;overflow:hidden}
+.benefit-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,92,252,0.5),transparent);opacity:0;transition:opacity 0.3s}
+.benefit-card:hover{border-color:rgba(124,92,252,0.3);transform:translateY(-3px)}
+.benefit-card:hover::before{opacity:1}
+.benefit-icon-wrap{width:48px;height:48px;border-radius:14px;background:rgba(124,92,252,0.1);border:1px solid rgba(124,92,252,0.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.25rem}
+.benefit-card h3{font-size:1rem;font-weight:700;margin-bottom:0.5rem}
+.benefit-card p{font-size:0.875rem;color:var(--muted);line-height:1.6}
+
+/* ─── PRODUCT PRESENTATION / CHECKOUT ────────────────────────── */
+.checkout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; max-width: 960px; margin: 0 auto; }
+.checkout-left { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 2.5rem; }
+.checkout-right { position: relative; }
+.checkout-list { display: flex; flex-direction: column; gap: 1.25rem; font-size: 0.95rem; margin-top: 1.5rem; }
+.checkout-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border); padding-bottom: 0.5rem; }
+.checkout-item span:first-child { display: flex; align-items: center; gap: 8px; }
+.checkout-item span:first-child::before { content: '✓'; color: var(--success); font-weight: 900; }
+.checkout-item span:last-child { color: var(--muted2); text-decoration: line-through; font-size: 0.9em; }
+.checkout-total { margin-top: 2rem; font-size: 1.2rem; font-weight: 800; display: flex; justify-content: space-between; padding-top: 1.5rem; border-top: 1px solid var(--border-strong); }
+.product-card { background: var(--card); border: 1px solid rgba(124,92,252,0.3); border-radius: 24px; padding: 3rem 2.5rem; position: relative; overflow: hidden; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+.product-card::before{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:60%;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.product-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:80%;height:300px;background:radial-gradient(ellipse at 50% 0%,rgba(124,92,252,0.12) 0%,transparent 70%);pointer-events:none}
+.billing-toggle { display: inline-flex; align-items: center; background: var(--bg2); border: 1px solid var(--border); border-radius: 999px; padding: 4px; margin-bottom: 2.5rem; }
+.toggle-btn { padding: 0.5rem 1.5rem; border-radius: 999px; font-size: 0.9rem; font-weight: 700; color: var(--muted); cursor: pointer; transition: all 0.2s; border: none; background: transparent; position: relative; }
+.toggle-btn.active { background: var(--accent); color: #fff; box-shadow: 0 4px 12px var(--accent-glow); }
+.save-badge { position: absolute; top: -12px; right: -20px; background: var(--success); color: #fff; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.2); font-weight: 800; pointer-events: none; white-space: nowrap; }
+.product-price{font-size:3.5rem;font-weight:900;letter-spacing:-2px;line-height:1;margin-bottom:0.4rem}
+.product-price span{font-size:1.1rem;font-weight:500;color:var(--muted)}
+.product-period{font-size:0.85rem;color:var(--muted2);margin-bottom:1.5rem; min-height: 40px;}
+@media(max-width:850px){ .checkout-grid { grid-template-columns: 1fr; } }
+.product-mockup-mini{border-radius:14px;overflow:hidden;border:1px solid var(--border);margin:2rem auto;max-width:500px;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.product-mockup-mini img{width:100%}
+
+/* ─── GUARANTEE ──────────────────────────────────────────────── */
+.guarantee-box{background:var(--bg2);border:1px solid var(--border);border-radius:24px;padding:3.5rem;position:relative;overflow:hidden;text-align:center;max-width:720px;margin:0 auto}
+.guarantee-box::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(34,197,94,0.06) 0%,transparent 60%);pointer-events:none}
+.guarantee-icon{font-size:4rem;margin-bottom:1.5rem;display:block}
+.guarantee-box h2{font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:900;letter-spacing:-1px;margin-bottom:1rem}
+.guarantee-box p{font-size:1rem;color:var(--muted);max-width:480px;margin:0 auto 2rem;line-height:1.75}
+.guarantee-items{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap}
+.guarantee-item{display:flex;align-items:center;gap:8px;font-size:0.88rem;font-weight:600;color:var(--success)}
+.guarantee-item::before{content:'✓';width:20px;height:20px;border-radius:50%;background:rgba(34,197,94,0.15);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:900;flex-shrink:0}
+
+/* ─── BONUS ──────────────────────────────────────────────────── */
+.bonus-section{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.bonus-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem;margin-top:3rem}
+.bonus-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:1.75rem;position:relative;overflow:hidden}
+.bonus-card::before{content:'BONUS';position:absolute;top:1rem;right:1rem;font-size:0.6rem;font-weight:800;color:var(--accent2);letter-spacing:1.5px;background:rgba(124,92,252,0.12);border:1px solid rgba(124,92,252,0.25);padding:2px 7px;border-radius:4px}
+.bonus-card-icon{font-size:2rem;margin-bottom:1rem}
+.bonus-card h3{font-size:0.95rem;font-weight:700;margin-bottom:0.4rem;padding-right:4rem}
+.bonus-card p{font-size:0.83rem;color:var(--muted);line-height:1.6;margin-bottom:1rem}
+.bonus-value{display:inline-flex;align-items:center;gap:5px;font-size:0.78rem;font-weight:700;color:var(--accent2);background:rgba(124,92,252,0.08);border:1px solid rgba(124,92,252,0.2);padding:3px 10px;border-radius:999px}
+.bonus-total-box{background:rgba(124,92,252,0.08);border:1px solid rgba(124,92,252,0.25);border-radius:16px;padding:2rem;text-align:center;margin-top:3rem}
+.bonus-total-box p{font-size:1.1rem;color:var(--muted);margin-bottom:0.75rem}
+.bonus-total-box .crossed{font-size:2rem;font-weight:900;color:var(--muted2);text-decoration:line-through;display:block;margin-bottom:0.25rem}
+.bonus-total-box .price-highlight{font-size:1rem;color:var(--accent2);font-weight:700}
+
+/* ─── CTA SECTION ────────────────────────────────────────────── */
+.cta-section{text-align:center;padding:5rem 1.5rem;background:radial-gradient(ellipse 80% 70% at 50% 50%,rgba(124,92,252,0.1) 0%,transparent 70%)}
+
+/* ─── FAQ ────────────────────────────────────────────────────── */
+.faq-list{max-width:700px;margin:3.5rem auto 0;display:flex;flex-direction:column;gap:1rem}
+.faq-item{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.faq-question{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;cursor:pointer;font-weight:700;font-size:0.95rem;gap:1rem;transition:color 0.2s;user-select:none}
+.faq-question:hover{color:var(--accent2)}
+.faq-arrow{font-size:1rem;color:var(--muted);transition:transform 0.3s;flex-shrink:0}
+.faq-answer{max-height:0;overflow:hidden;transition:max-height 0.4s ease,padding 0.3s}
+.faq-answer-inner{padding:0 1.5rem 1.25rem;font-size:0.9rem;color:var(--muted);line-height:1.7;border-top:1px solid var(--border)}
+.faq-item.open .faq-arrow{transform:rotate(180deg)}
+.faq-item.open .faq-answer{max-height:300px}
+
+/* ─── CLOSE SECTION ──────────────────────────────────────────── */
+.close-section{text-align:center;padding:8rem 1.5rem 6rem;position:relative;overflow:hidden}
+.close-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 90% 60% at 50% 50%,rgba(124,92,252,0.12) 0%,transparent 70%);pointer-events:none}
+.close-section h2{font-size:clamp(2.2rem,5vw,4rem);font-weight:900;line-height:1.08;letter-spacing:-2px;max-width:700px;margin:0 auto 1.5rem}
+.close-section p{font-size:1.1rem;color:var(--muted);max-width:500px;margin:0 auto 2.5rem;line-height:1.75}
+
+/* ─── FOOTER ─────────────────────────────────────────────────── */
+footer{border-top:1px solid var(--border);padding:2.5rem 2rem;text-align:center;color:var(--muted2);font-size:0.82rem}
+footer a{color:var(--muted);transition:color 0.2s}
+footer a:hover{color:var(--text)}
+.footer-links{display:flex;justify-content:center;gap:1.5rem;margin-top:0.75rem;flex-wrap:wrap}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
+@media(max-width:768px){
+  nav{padding:1rem 1.25rem}
+  .nav-link{display:none}
+  .hero{padding:5rem 1.25rem 4rem}
+  .section-gap{padding:5rem 0}
+  .alt-block{grid-template-columns:1fr;gap:2rem}
+  .alt-block.reverse .alt-img{order:0}
+  .alt-block.reverse .alt-text{order:0}
+  .alt-img{min-height:220px}
+  .product-card{padding:2.5rem 1.5rem}
+  .billing-toggle{flex-direction: column; width: 100%; border-radius: 12px; padding: 8px;}
+  .toggle-btn{width: 100%; border-radius: 8px;}
+  .save-badge { right: 10px; top: 50%; transform: translateY(-50%); }
+  .guarantee-box{padding:2.5rem 1.5rem}
+  .close-section{padding:5rem 1.25rem 4rem}
+  .bonus-card::before{top:0.75rem;right:0.75rem}
+}
+@media(max-width:500px){
+  .hero h1{letter-spacing:-1.5px}
+  .hero-trust{gap:0.75rem}
+}
+
+/* Animaciones de entrada */
+.fade-up{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ──────────────────────────────────────────────────── -->
+<nav>
+  <div class="logo">100<span>posts</span></div>
+  <div class="nav-right">
+    <a href="#product" class="nav-link">Producto</a>
+    <a href="#pricing" class="nav-link">Precios</a>
+    <a href="#faq" class="nav-link">FAQ</a>
+    <a href="#pricing" class="nav-cta">Empezar gratis</a>
+  </div>
+</nav>
+
+<!-- ─── 1. HERO ───────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">
+      <span class="dot-pulse"></span>
+      Nueva forma de crear contenido para Instagram
+    </div>
+    <h1>En 60 segundos tenés tu post<br><span class="highlight">listo para publicar</span>,<br>sin saber de diseño</h1>
+    <p class="hero-sub">
+      Subís la foto de tu celular, elegís el tipo de post y la IA genera la imagen, el copy y los hashtags. Todo. Solo publicás.
+    </p>
+    <div class="hero-actions">
+      <a href="#pricing" class="btn-primary lg" id="hero-cta">Quiero mis publicaciones →</a>
+      <a href="#product" class="btn-secondary">Ver cómo funciona</a>
+    </div>
+    <div class="hero-trust">
+      <span><span class="ico">✓</span> Sin tarjeta de crédito</span>
+      <span><span class="ico">✓</span> Cancelás cuando querés</span>
+      <span><span class="ico">✓</span> Resultados en el primer post</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 2. MOCKUP DEL PRODUCTO ────────────────────────────────── -->
+<section class="mockup-section section-gap" id="product">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:3rem" class="fade-up">
+      <div class="label-tag" style="justify-content:center">Así se ve por dentro</div>
+      <h2 class="section-title">Tres variaciones de posts,<br>listas en menos de un minuto</h2>
+      <p class="section-sub" style="margin:0 auto;text-align:center">Tu tienda publicando todos los días, sin contratar a nadie. Así se ve la pantalla cuando la IA termina de generar.</p>
+    </div>
+    <div class="mockup-wrapper fade-up">
+      <div class="mockup-glow"></div>
+      <div class="mockup-img">
+        <img src="product-mockup.png" alt="100posts - Interfaz del generador de posts de Instagram con IA" loading="lazy"/>
+      </div>
+    </div>
+    <!-- Prompt para GPT-4o -->
+    <!-- PROMPT IMAGEN: "Photorealistic product mockup of a premium MacBook Pro on a dark studio background. The laptop screen shows a modern dark-themed SaaS web app called '100posts', an AI-powered Instagram content generator. The interface displays a left sidebar with brand settings, and a main content area showing three Instagram post card previews (4:5 ratio) for an iPhone product - one minimal Apple-style, one urgency/offer style, one lifestyle style - all with purple-violet (#7C5CFC) accent colors. The UI is clean, typographic, premium. The laptop has a subtle violet glow emanating from the screen. Soft studio directional lighting from the left. The whole scene feels high-end, editorial, and trustworthy. No people. 8K, ultra-detailed." -->
+  </div>
+</section>
+
+<!-- ─── SOCIAL PROOF BAR ───────────────────────────────────────── -->
+<div class="social-proof-bar">
+  <div class="container">
+    <p>Usado por tiendas en toda Latinoamérica</p>
+    <div class="logo-row">
+      <span class="logo-item">PhoneStore</span>
+      <span class="logo-item">TechMóvil</span>
+      <span class="logo-item">CelularYa</span>
+      <span class="logo-item">MegaCell</span>
+      <span class="logo-item">iZone</span>
+      <span class="logo-item">MovilPro</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 3. DOLORES ────────────────────────────────────────────── -->
+<section class="section-gap">
+  <div class="container">
+    <div class="fade-up" style="max-width:640px">
+      <div class="label-tag">El problema real</div>
+      <h2 class="section-title">¿Te sentís así con las<br>redes de tu tienda?</h2>
+      <p class="section-sub">No es tu culpa. Nadie te enseñó a hacer contenido que venda. Pero mientras no publicás, la competencia sí.</p>
+    </div>
+    <div class="pains-grid fade-up">
+      <div class="pain-card">
+        <div class="pain-icon">💸</div>
+        <div>
+          <h3>Pagás diseñadores que cobran caro y tardan días</h3>
+          <p>Un diseñador cobra entre $50 y $200 por post, y igual necesitás mandarle brief, correcciones y esperar. Todo eso solo para publicar un celular.</p>
+        </div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">⏰</div>
+        <div>
+          <h3>Te perdés horas en Canva y el resultado no convence</h3>
+          <p>Abrís Canva con energía y a los 90 minutos tenés algo que ni siquiera te gusta. Y aun así lo publicás porque ya no tenés tiempo.</p>
+        </div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">📉</div>
+        <div>
+          <h3>Tus posts tienen likes pero nadie te escribe a comprar</h3>
+          <p>Bonito no es lo mismo que vendedor. Un post que vende necesita el copy correcto, el visual correcto y el momento correcto.</p>
+        </div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">🎲</div>
+        <div>
+          <h3>No tenés consistencia visual y tu perfil se ve amateur</h3>
+          <p>Un post minimalista, otro con fondo de color, otro con sticker. Tu perfil no transmite confianza y eso aleja a los compradores serios.</p>
+        </div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">🤔</div>
+        <div>
+          <h3>No sabés qué publicar ni con qué frecuencia</h3>
+          <p>¿Publicás el precio? ¿Mostrás el producto? ¿Hacés historia o post normal? La parálisis de análisis te hace no publicar nada.</p>
+        </div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">😤</div>
+        <div>
+          <h3>La competencia te gana en redes aunque vendás mejor</h3>
+          <p>Esa tienda que abrió hace 6 meses ya tiene 10k seguidores y llena el DM. Y vos tenés más variedad, mejores precios... pero menos visibilidad.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 4. BLOQUES FOTO + TEXTO ────────────────────────────────── -->
+<section class="section-gap" style="padding-top:0">
+  <div class="container">
+    <div class="alt-blocks">
+
+      <!-- BLOQUE 1 -->
+      <div class="alt-block fade-up">
+        <div class="alt-img" style="border:none;">
+          <div class="alt-img-glow"></div>
+          <img src="dolor-3.jpg" alt="Persona frustrada usando Canva" style="width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 1;">
+        </div>
+        <div class="alt-text">
+          <h3>Dos horas de Canva para un post que nadie ve</h3>
+          <p>Buscás la plantilla, cambiás los colores, borrás una capa, deshacés, escribís el texto, lo movés, no te convence. Guardás. Publicás. Tres likes. Dos de tu prima. Uno tuyo.</p>
+          <div class="pain-stat"><strong>85%</strong> de los dueños de tienda dice que crear contenido les roba tiempo de vender</div>
+        </div>
+      </div>
+
+      <!-- BLOQUE 2 -->
+      <div class="alt-block reverse fade-up">
+        <div class="alt-img" style="border:none;">
+          <div class="alt-img-glow"></div>
+          <img src="dolor-2.jpg" alt="Tu perfil vs el de la competencia" style="width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 1;">
+        </div>
+        <div class="alt-text">
+          <h3>Tu perfil no transmite confianza y lo perdés en 3 segundos</h3>
+          <p>Cuando alguien entra a tu Instagram y ve un perfil desprolijo, no pregunta el precio. Sale. Compra en otra tienda. La primera impresión en redes decide si te contactan o no.</p>
+          <div class="pain-stat"><strong>3 segundos</strong> es lo que tarda un cliente en decidir si te escribe o se va</div>
+        </div>
+      </div>
+
+      <!-- BLOQUE 3 -->
+      <div class="alt-block fade-up">
+        <div class="alt-img" style="border:none;">
+          <div class="alt-img-glow"></div>
+          <img src="dolor-1.jpg" alt="Pierdes clientes cada día que no publicas" style="width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 1;">
+        </div>
+        <div class="alt-text">
+          <h3>Cada día que no publicás, perdés clientes que sí habrían comprado</h3>
+          <p>El algoritmo premia a quien publica seguido. Y tus clientes potenciales están viendo el feed todos los días. Si no aparecés vos, aparece tu competencia. Y compran ahí.</p>
+          <div class="pain-stat"><strong>4 de cada 5</strong> compradores buscan el producto en Instagram antes de preguntar precio</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── 5. BENEFICIOS ─────────────────────────────────────────── -->
+<section class="section-gap" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="fade-up" style="text-align:center;max-width:640px;margin:0 auto">
+      <div class="label-tag" style="justify-content:center">Lo que ganás</div>
+      <h2 class="section-title">Todo lo que necesitás<br>para vender en Instagram</h2>
+      <p class="section-sub" style="text-align:center;margin:0 auto">Sin diseñadores, sin agencias, sin perder horas. Solo resultados.</p>
+    </div>
+    <div class="benefits-grid fade-up">
+      <div class="benefit-card">
+        <div class="benefit-icon-wrap">⚡</div>
+        <h3>Posts listos en 60 segundos</h3>
+        <p>Subís la foto del celular, ponés el precio y en menos de un minuto tenés tres variaciones de posts listas para publicar.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon-wrap">🎨</div>
+        <h3>Estilo de marca consistente</h3>
+        <p>Configurás tu identidad visual una sola vez. Todos tus posts van a verse como si los hubiera hecho el mismo diseñador premium.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon-wrap">✍️</div>
+        <h3>Copy que vende, escrito por IA</h3>
+        <p>Caption, call to action y hashtags generados específicamente para convertir seguidores en clientes que te escriben al DM.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon-wrap">🚫</div>
+        <h3>Sin diseñadores, sin agencias</h3>
+        <p>Cero dependencia externa. Publicás cuando querés, lo que querés, en el momento en que lo decidís vos, no un freelancer.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon-wrap">🎯</div>
+        <h3>Control total de lo que publicás</h3>
+        <p>Elegís entre las 3 variaciones que genera la IA. Le hacés ajustes si querés. La decisión siempre es tuya.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon-wrap">🕐</div>
+        <h3>Más tiempo para atender tu negocio</h3>
+        <p>Recuperás entre 2 y 5 horas por semana que antes dedicabas a crear contenido. Ese tiempo ahora lo usás para vender.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 6. PRESENTACIÓN DEL PRODUCTO + PRECIO ─────────────────── -->
+<section class="section-gap" id="pricing">
+  <div class="container">
+    
+    <div style="text-align:center" class="fade-up">
+      <div class="label-tag" style="justify-content:center">Oferta de Lanzamiento</div>
+      <h2 class="section-title">Empezá a crecer hoy</h2>
+      
+      <div class="billing-toggle">
+        <button class="toggle-btn active" id="btn-monthly">Mensual</button>
+        <button class="toggle-btn" id="btn-annual">Anual <span class="save-badge">Ahorras $58 USD</span></button>
+      </div>
+    </div>
+
+    <div class="checkout-grid fade-up">
+      <!-- Columna Izquierda: Checkout Form -->
+      <div class="checkout-left form-container">
+        <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 2rem; text-align: left;">Completa tu compra</h3>
+        
+        <form id="checkout-form">
+          <div style="margin-bottom: 1.5rem; text-align: left;">
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--muted);">Paso 1: Tu Cuenta</label>
+            <input type="email" placeholder="Email para crear tu cuenta" required style="width: 100%; padding: 1.1rem; border-radius: 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 0.95rem; margin-bottom: 1rem;">
+            <input type="text" placeholder="Nombre completo" required style="width: 100%; padding: 1.1rem; border-radius: 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 0.95rem;">
+          </div>
+          
+          <div style="margin-bottom: 2rem; text-align: left;">
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--muted);">Paso 2: Detalles de Pago</label>
+            <div style="padding: 1.5rem; border-radius: 12px; background: rgba(0,0,0,0.3); border: 1px dashed var(--accent); text-align: center;">
+               <span style="font-size: 2rem; display: block; margin-bottom: 0.5rem; opacity: 0.8;">🔒</span>
+               <p style="font-size: 0.85rem; color: var(--muted); line-height: 1.6;">Pago encriptado con 256-bits. El botón te llevará a nuestra pasarela segura donde podrás elegir pagar en USD o tu moneda local, vía tarjeta o métodos locales.</p>
+            </div>
+          </div>
+
+          <a href="https://cienposts.lemonsqueezy.com/checkout/buy/186dbd8e-5849-4c01-8a29-ad74fe6a173a?currency=USD" target="_blank" class="btn-primary lg" style="display:flex; width: 100%; justify-content: center; font-size: 1.1rem; padding: 1.2rem; margin-bottom: 1rem; text-decoration:none;">Ir al pago seguro →</a>
+          
+          <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; font-size: 0.75rem; color: var(--muted2); font-weight: 500;">
+            <span>🛡️ Garantía de 7 días</span>
+            <span>⏱️ Acceso inmediato</span>
+          </div>
+        </form>
+      </div>
+
+      <!-- Columna Derecha: Tarjeta Principal -->
+      <div class="checkout-right">
+        <div class="product-card">
+          <div class="product-glow"></div>
+          
+          <div style="text-align: left; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);">
+            <div class="product-name" style="font-size: 1.1rem; margin-bottom: 0.2rem;">100posts Pro</div>
+            <div class="product-stars" style="font-size: 0.9rem; margin-bottom: 0;">★★★★★</div>
+          </div>
+          
+          <div class="checkout-list" style="margin-top: 0; margin-bottom: 2rem; font-size: 0.85rem;">
+            <div class="checkout-item" style="border-bottom: none; margin-bottom: 0.5rem;"><span style="font-weight: 700; color: #fff;">Resumen de tu compra:</span></div>
+            <div class="checkout-item"><span>Generaciones Ilimitadas</span><span>$99/mes</span></div>
+            <div class="checkout-item"><span>Copywriting por IA</span><span>$49/mes</span></div>
+            <div class="checkout-item"><span>Diseños Premium</span><span>$150/mes</span></div>
+            <div class="checkout-item"><span>Bonuses Extras</span><span>$63</span></div>
+          </div>
+
+          <div class="checkout-total" style="align-items: flex-end; margin-top: 0; padding-top: 1rem; margin-bottom: 1rem;">
+          </div>
+          
+          <div class="product-pricing" style="margin-top: 1rem; margin-bottom: 0; text-align: left;">
+            <div class="product-price-old" id="price-old" style="font-size: 0.9rem;">$361/mes si lo armaras por tu cuenta</div>
+            <div class="product-price" id="price-display" style="font-size: 3rem;">$29 <span style="font-size:1rem;">USD</span></div>
+            <div class="product-period" id="period-display" style="font-size: 0.8rem; margin-bottom: 0; min-height: auto;">Facturado mensualmente ($29/mes).<br>El precio se adapta a tu moneda en el checkout.</div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── 7. GARANTÍA ───────────────────────────────────────────── -->
+<section class="section-gap" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="guarantee-box fade-up">
+      <span class="guarantee-icon">🛡️</span>
+      <h2>Riesgo cero. En serio.</h2>
+      <p>Probás 7 días gratis, sin poner la tarjeta. Si en esos 7 días no generás posts que te gusten, no pagás nada. Te vas sin perder un peso. La única trampa es que probablemente te quedes.</p>
+      <div class="guarantee-items">
+        <div class="guarantee-item">7 días de prueba gratis</div>
+        <div class="guarantee-item">Sin tarjeta de crédito</div>
+        <div class="guarantee-item">Acceso completo desde el día 1</div>
+        <div class="guarantee-item">Cancelás sin llamadas ni excusas</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 8. BONUS ──────────────────────────────────────────────── -->
+<section class="bonus-section section-gap">
+  <div class="container">
+    <div class="fade-up" style="text-align:center;max-width:640px;margin:0 auto">
+      <div class="label-tag" style="justify-content:center">Solo por suscribirte hoy</div>
+      <h2 class="section-title">Te llevás todo esto<br><span class="highlight">sin pagar extra</span></h2>
+      <p class="section-sub" style="text-align:center;margin:0 auto">Cuando te suscribís a 100posts Pro, estos bonuses se suman automáticamente a tu cuenta. Sin condiciones.</p>
+    </div>
+    <div class="bonus-grid fade-up">
+      <div class="bonus-card">
+        <div class="bonus-card-icon">📅</div>
+        <h3>Guía de mejores horarios para publicar según tu rubro</h3>
+        <p>Descubrís exactamente a qué hora publicar en Instagram si vendés tecnología en Argentina, Uruguay, México o cualquier país de LatAm para maximizar el alcance.</p>
+        <div class="bonus-value">Valor $19 · Tuyo gratis</div>
+      </div>
+      <div class="bonus-card">
+        <div class="bonus-card-icon">🎣</div>
+        <h3>Pack de 20 hooks de caption que más venden para celulares</h3>
+        <p>Las primeras frases exactas que hacen que la gente deje de scrollear y lea tu caption. Probadas en tiendas reales de tecnología en Latinoamérica.</p>
+        <div class="bonus-value">Valor $29 · Tuyo gratis</div>
+      </div>
+      <div class="bonus-card">
+        <div class="bonus-card-icon">✅</div>
+        <h3>Checklist de identidad de marca en 10 minutos</h3>
+        <p>Una guía paso a paso para definir los colores, tipografías y tono de tu tienda en menos de 10 minutos. Para que todos tus posts tengan el mismo look desde el día uno.</p>
+        <div class="bonus-value">Valor $15 · Tuyo gratis</div>
+      </div>
+      <div class="bonus-card">
+        <div class="bonus-card-icon">🚀</div>
+        <h3>Acceso anticipado a nuevas funciones</h3>
+        <p>Antes de que se liberen al público, vos las tenés. Reels generados por IA, publicación directa a Instagram, generador de Stories. Vos sos el primero.</p>
+        <div class="bonus-value">Valor exclusivo · Acceso VIP</div>
+      </div>
+    </div>
+    <div class="bonus-total-box fade-up">
+      <p>Si compraras todo esto por separado, pagarías</p>
+      <span class="crossed">$92 + $29/mes</span>
+      <p class="price-highlight">Con 100posts Pro, todo incluido en <strong style="color:var(--accent2);font-size:1.3rem">$29/mes</strong> · Primeros 7 días gratis</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 9. BOTÓN CTA ──────────────────────────────────────────── -->
+<section class="cta-section fade-up">
+  <div class="container">
+    <div class="label-tag" style="justify-content:center;margin:0 auto 1.5rem">Acceso inmediato</div>
+    <h2 class="section-title" style="text-align:center;max-width:600px;margin:0 auto 1rem">Empezá hoy mismo.<br>Sin excusas, sin riesgo.</h2>
+    <p style="text-align:center;color:var(--muted);margin-bottom:2rem;font-size:1rem">Tu próximo post puede estar listo en los próximos 5 minutos.</p>
+    <div style="display:flex;justify-content:center">
+      <a href="#pricing" class="btn-primary lg" id="mid-cta">Quiero mis publicaciones →</a>
+    </div>
+    <p style="text-align:center;font-size:0.8rem;color:var(--muted2);margin-top:1rem">Sin tarjeta de crédito · Activación inmediata</p>
+  </div>
+</section>
+
+<!-- ─── 10. FAQ ────────────────────────────────────────────────── -->
+<section class="section-gap" id="faq" style="background:var(--bg2);border-top:1px solid var(--border)">
+  <div class="container">
+    <div class="fade-up" style="text-align:center;max-width:580px;margin:0 auto">
+      <div class="label-tag" style="justify-content:center">Preguntas frecuentes</div>
+      <h2 class="section-title">Respondemos todo</h2>
+    </div>
+    <div class="faq-list fade-up">
+
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿Necesito saber de diseño o marketing?
+          <span class="faq-arrow">↓</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Para nada. 100posts está diseñado para dueños de tienda que no tienen tiempo ni conocimientos de diseño. Solo subís la foto del producto, escribís el precio y la IA hace el resto. Si sabés usar WhatsApp, podés usar 100posts.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿Funciona para cualquier celular o marca?
+          <span class="faq-arrow">↓</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Sí. La IA adapta el estilo visual y el copy según el producto que le des. Funciona igual de bien para un Samsung de gama media, un iPhone Pro Max o un celular chino de entrada. También sirve para accesorios como cases, auriculares y protectores.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿Puedo cancelar cuando quiero?
+          <span class="faq-arrow">↓</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Sí, en cualquier momento y desde tu cuenta, en 2 clics. Sin formularios, sin llamadas, sin excusas de soporte. Cancelás hoy y no se te cobra el mes siguiente. Sin letra chica.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿Cuántos posts puedo generar?
+          <span class="faq-arrow">↓</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Con el plan Pro, generaciones ilimitadas. Generás 30 posts por día si querés. Sin límites. El plan Gratis te da 5 generaciones por mes para probar. Con Pro podés publicar todos los días sin bloquearte nunca.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿Las imágenes son de alta calidad para subir a Instagram?
+          <span class="faq-arrow">↓</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Sí. Los posts se generan en resolución 4:5 (formato vertical óptimo para Instagram) en alta resolución, listos para descargar y subir sin pérdida de calidad. Se ven profesionales tanto en el feed como en Stories.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿Qué pasa si pruebo y no me convence?
+          <span class="faq-arrow">↓</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            No te cobramos nada. Probás 7 días gratis, sin tarjeta de crédito. Si al terminar los 7 días sentís que no es para vos, simplemente no ponés los datos de pago y chau. No perdiste nada más que 5 minutos de prueba.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── 11. CIERRE ────────────────────────────────────────────── -->
+<section class="close-section">
+  <div class="container" style="position:relative;z-index:1">
+    <div class="fade-up">
+      <div class="label-tag" style="justify-content:center;margin:0 auto 2rem">Última chance</div>
+      <h2>Dejá de perder ventas<br>porque no publicás.<br><span class="highlight">Empezá hoy.</span></h2>
+      <p>Tu competencia ya está publicando. Cada día que pasa sin contenido en tu Instagram es un cliente que te compra a otro. Con 100posts, ese problema desaparece en 60 segundos.</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem">
+        <a href="#pricing" class="btn-primary lg" id="final-cta">Quiero mis publicaciones →</a>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:1.5rem;flex-wrap:wrap;font-size:0.82rem;color:var(--muted2)">
+        <span>✓ Sin tarjeta de crédito</span>
+        <span>✓ Activación inmediata</span>
+        <span>✓ Cancelás cuando querés</span>
+        <span>✓ 7 días gratis completos</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─────────────────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <div style="font-weight:800;font-size:1.1rem;margin-bottom:0.75rem">100<span style="color:var(--accent)">posts</span></div>
+    <p>Hecho para tiendas de celulares en Latinoamérica</p>
+    <div class="footer-links">
+      <a href="#">Términos</a>
+      <a href="#">Privacidad</a>
+      <a href="#">Contacto</a>
+    </div>
+    <p style="margin-top:1rem;font-size:0.75rem">© 2025 100posts. Todos los derechos reservados.</p>
+  </div>
+</footer>
+
+<!-- ─── SCRIPTS ─────────────────────────────────────────────────── -->
+<script>
+// ─── FAQ Accordion ─────────────────────────────────────────────
+document.querySelectorAll('.faq-question').forEach(q => {
+  q.addEventListener('click', () => {
+    const item = q.parentElement;
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  });
+});
+
+// ─── Fade-up on scroll ─────────────────────────────────────────
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// ─── Pricing Toggle Logic ──────────────────────────────────────
+const btnMonthly = document.getElementById('btn-monthly');
+const btnAnnual = document.getElementById('btn-annual');
+const priceDisplay = document.getElementById('price-display');
+const periodDisplay = document.getElementById('period-display');
+const priceOld = document.getElementById('price-old');
+const checkoutTotal = document.querySelector('.checkout-total span:last-child');
+
+if (btnMonthly && btnAnnual) {
+  btnMonthly.addEventListener('click', () => {
+    btnMonthly.classList.add('active');
+    btnAnnual.classList.remove('active');
+    priceDisplay.innerHTML = '$29 <span>USD</span>';
+    periodDisplay.innerHTML = 'Facturado mensualmente.<br>Un cliente más y se paga solo.';
+    priceOld.innerHTML = '$361/mes si lo armaras por tu cuenta';
+    checkoutTotal.innerHTML = '<span style="font-size: 0.8rem; text-decoration: line-through; color: var(--muted2); margin-right: 8px;">$361 USD</span> <span style="color: var(--text)">Hoy $29 /mes</span>';
+  });
+
+  btnAnnual.addEventListener('click', () => {
+    btnAnnual.classList.add('active');
+    btnMonthly.classList.remove('active');
+    priceDisplay.innerHTML = '$290 <span>USD</span>';
+    periodDisplay.innerHTML = 'Facturado anualmente ($24/mes).<br>Te llevás 2 meses gratis.';
+    priceOld.innerHTML = '$4,332/año si lo armaras por tu cuenta';
+    checkoutTotal.innerHTML = '<span style="font-size: 0.8rem; text-decoration: line-through; color: var(--muted2); margin-right: 8px;">$4,332 USD</span> <span style="color: var(--text)">Hoy $290 /año</span>';
+  });
+}
+
+// ─── Smooth scroll for anchors ─────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+
+</body>
+</html>

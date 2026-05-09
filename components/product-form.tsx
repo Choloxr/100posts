@@ -1,66 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { MODE_KEYS, modeLabel, type ModeKey } from "@/lib/modes/catalog";
+import { POST_TYPES, postTypeLabel, type PostType } from "@/lib/product/post-type";
 
-function ModeSlot({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: ModeKey;
-  onChange: (v: ModeKey) => void;
-}) {
-  return (
-    <label className="block text-sm font-medium">
-      {label}
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value as ModeKey)}
-        className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]"
-      >
-        {MODE_KEYS.map((k) => (
-          <option key={k} value={k}>
-            {modeLabel(k)}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}
+/** Aligned with 3 variants per run; replace when billing tracks real credits. */
+const CREDITS_PER_RUN = 3;
 
-export function ProductForm({
-  defaultModes,
-}: {
-  defaultModes: [ModeKey, ModeKey, ModeKey];
-}) {
+export function ProductForm() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [specs, setSpecs] = useState("");
   const [files, setFiles] = useState<FileList | null>(null);
-  const [m0, setM0] = useState<ModeKey>(defaultModes[0]);
-  const [m1, setM1] = useState<ModeKey>(defaultModes[1]);
-  const [m2, setM2] = useState<ModeKey>(defaultModes[2]);
+  const [postType, setPostType] = useState<PostType>("sale");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
-
-  useEffect(() => {
-    setM0(defaultModes[0]);
-    setM1(defaultModes[1]);
-    setM2(defaultModes[2]);
-  }, [defaultModes]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setMsg(null);
-    if (new Set([m0, m1, m2]).size !== 3) {
-      setMsg("Elegí tres modos distintos.");
-      return;
-    }
     setBusy(true);
     try {
       const supabase = createClient();
@@ -120,7 +80,7 @@ export function ProductForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           productId,
-          modeKeys: [m0, m1, m2],
+          postType,
         }),
       });
       const genJson = (await genRes.json()) as { runId?: string; error?: string };
@@ -140,71 +100,102 @@ export function ProductForm({
     }
   }
 
+  const inputClass =
+    "mt-1.5 w-full rounded-input border border-[var(--border)] bg-[rgba(255,255,255,0.03)] px-4 py-3 text-sm text-[var(--fg)] outline-none transition-all duration-fast placeholder:text-[var(--muted2)] focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-glow)]";
+
+  const selectClass =
+    "mt-1.5 w-full rounded-input border border-[var(--border)] bg-[rgba(255,255,255,0.03)] px-4 py-3 text-sm text-[var(--fg)] outline-none transition-all duration-fast focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-glow)]";
+
   return (
     <form
       onSubmit={(e) => void onSubmit(e)}
-      className="space-y-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5"
+      className="space-y-5 rounded-card border border-[var(--border)] bg-[var(--surface)] p-6"
     >
-      <fieldset className="space-y-3">
-        <legend className="text-sm font-semibold text-[var(--fg)]">Modos para esta corrida</legend>
-        <p className="text-xs text-[var(--muted)]">
-          Tres estilos distintos (feed vende estética). Se genera un carrusel por modo.
-        </p>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <ModeSlot label="Post 1" value={m0} onChange={setM0} />
-          <ModeSlot label="Post 2" value={m1} onChange={setM1} />
-          <ModeSlot label="Post 3" value={m2} onChange={setM2} />
-        </div>
-      </fieldset>
-
-      <label className="block text-sm font-medium">
+      <label className="block text-sm font-semibold text-[var(--fg)]">
         Nombre del producto
         <input
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]"
+          className={inputClass}
           placeholder="Samsung Galaxy A55 5G"
         />
       </label>
-      <label className="block text-sm font-medium">
-        Precio (texto a mostrar)
+
+      <label className="block text-sm font-semibold text-[var(--fg)]">
+        Precio
         <input
           required
           value={price}
           onChange={(e) => setPrice(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]"
+          className={inputClass}
           placeholder="$ 349.999"
         />
       </label>
-      <label className="block text-sm font-medium">
-        Specs / notas
-        <textarea
-          value={specs}
-          onChange={(e) => setSpecs(e.target.value)}
-          rows={4}
-          className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]"
-          placeholder="Pantalla 6.6 pulgadas Super AMOLED, 8GB RAM, 128GB, batería 5000mAh…"
-        />
-      </label>
-      <label className="block text-sm font-medium">
-        Fotos del producto (opcional, hasta 5)
+
+      <label className="block text-sm font-semibold text-[var(--fg)]">
+        Fotos (opcional, hasta 5)
         <input
           type="file"
           accept="image/*"
           multiple
           onChange={(e) => setFiles(e.target.files)}
-          className="mt-1 block w-full text-sm text-[var(--muted)]"
+          className="mt-1.5 block w-full text-sm text-[var(--muted)] file:mr-3 file:rounded-btn file:border-0 file:bg-[var(--accent)]/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-[var(--accent)] hover:file:bg-[var(--accent)]/20"
         />
       </label>
-      {msg ? <p className="text-sm text-red-500">{msg}</p> : null}
-      <button
-        type="submit"
-        disabled={busy}
-        className="w-full rounded-lg bg-[var(--accent)] py-2.5 text-sm font-medium text-[var(--accent-fg)] disabled:opacity-50"
-      >
-        {busy ? "Generando… (~20–60s)" : "Generar 3 posts"}
-      </button>
+
+      <details className="rounded-card border border-[var(--border)] bg-[var(--bg)] px-4 py-3">
+        <summary className="cursor-pointer text-sm font-semibold text-[var(--fg)]">
+          Agregar detalles opcionales
+        </summary>
+        <label className="mt-4 block text-xs font-medium text-[var(--muted)]">
+          Specs / notas para la IA
+          <textarea
+            value={specs}
+            onChange={(e) => setSpecs(e.target.value)}
+            rows={4}
+            className={`${inputClass} mt-1.5 resize-none`}
+            placeholder="Pantalla 6.6 pulgadas Super AMOLED, 8GB RAM, 128GB, batería 5000mAh…"
+          />
+        </label>
+      </details>
+
+      <label className="block text-sm font-semibold text-[var(--fg)]">
+        Tipo de post
+        <select
+          value={postType}
+          onChange={(e) => setPostType(e.target.value as PostType)}
+          className={selectClass}
+        >
+          {POST_TYPES.map((t) => (
+            <option key={t} value={t}>
+              {postTypeLabel(t)}
+            </option>
+          ))}
+        </select>
+        <span className="mt-1.5 block text-xs text-[var(--muted)]">
+          Elegimos tres estilos visuales distintos para esta corrida según este tipo.
+        </span>
+      </label>
+
+      {msg ? (
+        <p className="rounded-btn border border-[var(--error)]/30 bg-[var(--error)]/10 px-4 py-2.5 text-sm text-[var(--error)]">
+          {msg}
+        </p>
+      ) : null}
+
+      <div className="space-y-2 pt-1">
+        <button
+          type="submit"
+          disabled={busy}
+          className="w-full rounded-btn bg-[var(--accent)] py-3 text-sm font-semibold text-[var(--accent-fg)] transition-all duration-fast hover:-translate-y-px hover:shadow-glow disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
+        >
+          {busy ? "Generando… (~20–60s)" : "Generar posts"}
+        </button>
+        <p className="text-center text-xs text-[var(--muted)]">
+          Usa {CREDITS_PER_RUN} créditos · tres carruseles listos para publicar
+        </p>
+      </div>
     </form>
   );
 }

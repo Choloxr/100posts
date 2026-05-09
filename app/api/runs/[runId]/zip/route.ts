@@ -3,10 +3,15 @@ import JSZip from "jszip";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ runId: string }> }
 ) {
   const { runId } = await context.params;
+  const variantParam = new URL(request.url).searchParams.get("variant");
+  const variantFilter =
+    variantParam === "0" || variantParam === "1" || variantParam === "2"
+      ? Number(variantParam)
+      : null;
   const supabase = await createClient();
   const {
     data: { user },
@@ -43,9 +48,18 @@ export async function GET(
     return NextResponse.json({ error: "Sin resultados" }, { status: 400 });
   }
 
+  const filtered =
+    variantFilter === null
+      ? outputs
+      : outputs.filter((o) => o.variant_index === variantFilter);
+
+  if (!filtered.length) {
+    return NextResponse.json({ error: "Variante no encontrada" }, { status: 400 });
+  }
+
   const zip = new JSZip();
 
-  for (const out of outputs) {
+  for (const out of filtered) {
     const paths = (out.carousel_paths as string[] | null) ?? [];
     let si = 0;
     for (const p of paths) {
@@ -68,12 +82,14 @@ export async function GET(
 
   const nodeBuffer = await zip.generateAsync({ type: "nodebuffer" });
   const short = runId.replace(/-/g, "").slice(0, 10);
+  const suffix =
+    variantFilter !== null ? `-variant-${variantFilter}` : "";
 
   return new NextResponse(new Uint8Array(nodeBuffer), {
     status: 200,
     headers: {
       "Content-Type": "application/zip",
-      "Content-Disposition": `attachment; filename="100posts-${short}.zip"`,
+      "Content-Disposition": `attachment; filename="100posts-${short}${suffix}.zip"`,
     },
   });
 }

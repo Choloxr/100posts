@@ -1,4 +1,4 @@
-import { AppHeader } from "@/components/app-header";
+import { Sidebar } from "@/components/sidebar";
 
 export default function MainLayout({
   children,
@@ -7,8 +7,12 @@ export default function MainLayout({
 }) {
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)]">
-      <AppHeader />
-      <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+      <Sidebar />
+      <main className="ml-[260px] min-h-screen">
+        <div className="mx-auto max-w-[1180px] px-8 py-10">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

@@ -3,21 +3,57 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
+function describeSignInError(raw: string): string {
+  const m = raw.trim().toLowerCase();
+  if (
+    m.includes("rate limit") ||
+    m.includes("too many requests") ||
+    m.includes("email rate limit") ||
+    m === "429" ||
+    m.includes("over_email_send_rate_limit")
+  ) {
+    return "Llegamos al límite de envíos de email (Supabase). Esperá varios minutos y volvé a pedir el link. Para muchos intentos en desarrollo, configurá SMTP en el proyecto (enlace abajo).";
+  }
+  return raw;
+}
+
+function describeAuthCallbackFailure(reason: string): string {
+  const r = reason.trim().toLowerCase();
+  if (r === "missing_token") {
+    return "No pudimos abrir el enlace (faltan datos o el mail es antiguo). Pedí un link nuevo abajo.";
+  }
+  if (
+    r.includes("expired") ||
+    r.includes("invalid") ||
+    r.includes("otp") ||
+    r.includes("already been used") ||
+    r.includes("already used")
+  ) {
+    return "El enlace venció, ya se usó o no es válido. Escribí tu email y tocá «Enviar link de acceso» para recibir otro.";
+  }
+  return "No pudimos completar el acceso con ese enlace. Pedí uno nuevo con tu email abajo.";
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "sent" | "error">("idle");
   const [message, setMessage] = useState("");
-  const [hasAuthError, setHasAuthError] = useState(false);
+  const [authErrorText, setAuthErrorText] = useState<string | null>(null);
+  const [isRateLimitError, setIsRateLimitError] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setHasAuthError(params.get("error") === "auth");
+    if (params.get("error") !== "auth") return;
+    const reason = params.get("reason") ?? "";
+    setAuthErrorText(describeAuthCallbackFailure(reason || "unknown"));
+    window.history.replaceState(null, "", window.location.pathname);
   }, []);
 
   async function sendMagicLink(e: React.FormEvent) {
     e.preventDefault();
     setStatus("loading");
     setMessage("");
+    setIsRateLimitError(false);
     const supabase = createClient();
     const origin = window.location.origin;
     const { error } = await supabase.auth.signInWithOtp({
@@ -25,8 +61,10 @@ export default function LoginPage() {
       options: { emailRedirectTo: `${origin}/auth/callback` },
     });
     if (error) {
+      const friendly = describeSignInError(error.message);
       setStatus("error");
-      setMessage(error.message);
+      setMessage(friendly);
+      setIsRateLimitError(friendly !== error.message);
       return;
     }
     setStatus("sent");
@@ -34,49 +72,52 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-slate-950 px-4 py-12">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[var(--bg)] px-4 py-12">
+      {/* Ambient glow */}
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(99,102,241,0.35),transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(124,92,252,0.2),transparent)]"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_100%,rgba(14,165,233,0.12),transparent_50%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_100%,rgba(139,92,246,0.08),transparent_50%)]"
         aria-hidden
       />
 
       <div className="relative z-10 w-full max-w-md">
-        <div className="mb-8 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300/90">
+        {/* Brand header */}
+        <div className="mb-10 text-center">
+          <p className="text-sm font-extrabold uppercase tracking-[0.2em] text-[var(--accent)]">
             100posts
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <h1 className="mt-3 text-[36px] font-bold tracking-[-0.03em] leading-[1.1] text-[var(--fg)]">
             Carruseles que venden
           </h1>
-          <p className="mt-3 text-sm leading-relaxed text-slate-400 sm:text-base">
+          <p className="mt-4 text-[15px] leading-relaxed text-[var(--muted)]">
             Para tiendas de celulares. Tres estilos, marca coherente, listo para Instagram
             en un clic.
           </p>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-6 shadow-2xl shadow-indigo-950/50 backdrop-blur-md sm:p-8">
-          <h2 className="text-sm font-medium text-slate-200">Entrá con tu email</h2>
-          <p className="mt-1 text-xs text-slate-500">
+        {/* Login card */}
+        <div className="rounded-card-lg border border-[var(--border)] bg-[var(--surface)] p-7 shadow-card sm:p-9">
+          <h2 className="text-sm font-bold text-[var(--fg)]">Entrá con tu email</h2>
+          <p className="mt-1 text-xs text-[var(--muted)]">
             Te enviamos un link de acceso. Sin contraseña.
           </p>
-          {hasAuthError ? (
-            <p className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
-              El enlace venció o no es válido. Pedí uno nuevo.
+          {authErrorText ? (
+            <p className="mt-4 rounded-btn border border-[var(--warning)]/30 bg-[var(--warning)]/10 px-4 py-2.5 text-xs leading-relaxed text-[var(--warning)]">
+              {authErrorText}
             </p>
           ) : null}
-          <form onSubmit={(e) => void sendMagicLink(e)} className="mt-6 space-y-4">
-            <label className="block text-xs font-medium text-slate-400">
+          <form onSubmit={(e) => void sendMagicLink(e)} className="mt-6 space-y-5">
+            <label className="block text-xs font-semibold text-[var(--muted)]">
               Email
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 outline-none ring-2 ring-transparent transition placeholder:text-slate-600 focus:border-indigo-500/50 focus:ring-indigo-500/30"
+                className="mt-1.5 w-full rounded-input border border-[var(--border)] bg-[rgba(255,255,255,0.03)] px-4 py-3.5 text-sm text-[var(--fg)] outline-none transition-all duration-fast placeholder:text-[var(--muted2)] focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-glow)]"
                 placeholder="vos@tutienda.com"
                 autoComplete="email"
               />
@@ -84,24 +125,42 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={status === "loading"}
-              className="w-full rounded-xl bg-indigo-500 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-btn bg-[var(--accent)] py-3.5 text-sm font-semibold text-white transition-all duration-fast hover:-translate-y-px hover:shadow-glow active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
             >
               {status === "loading" ? "Enviando…" : "Enviar link de acceso"}
             </button>
           </form>
           {message ? (
-            <p
-              className={`mt-4 text-sm ${status === "error" ? "text-red-400" : "text-slate-400"}`}
+            <div
+              className={`mt-4 text-sm leading-relaxed ${
+                status === "error"
+                  ? isRateLimitError
+                    ? "text-[var(--warning)]"
+                    : "text-[var(--error)]"
+                  : "text-[var(--muted)]"
+              }`}
             >
-              {message}
-            </p>
+              <p>{message}</p>
+              {isRateLimitError ? (
+                <p className="mt-2">
+                  <a
+                    href="https://supabase.com/docs/guides/auth/auth-smtp"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-[var(--warning)] underline decoration-[var(--warning)]/40 underline-offset-2 hover:text-[var(--fg)]"
+                  >
+                    Configurar SMTP en Supabase
+                  </a>
+                </p>
+              ) : null}
+            </div>
           ) : null}
         </div>
 
-        <p className="mt-8 text-center text-xs text-slate-600">
+        <p className="mt-8 text-center text-xs text-[var(--muted2)]">
           Al continuar aceptás cookies de sesión.{" "}
-          <span className="text-slate-500">
-            (Si ves una pantalla de “configuración”, faltan variables en Vercel.)
+          <span className="text-[var(--muted)]">
+            (Si ves una pantalla de &ldquo;configuración&rdquo;, faltan variables en Vercel.)
           </span>
         </p>
       </div>

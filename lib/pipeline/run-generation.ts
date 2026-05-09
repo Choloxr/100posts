@@ -6,6 +6,7 @@ import { generateBackgroundTexture } from "@/lib/fal/texture";
 import { renderSlidePng, IG_WIDTH, IG_HEIGHT } from "@/lib/render/slide";
 import type { BrandTone } from "@/lib/openai/generate-copy";
 import type { ModeKey } from "@/lib/modes/catalog";
+import type { PostType } from "@/lib/product/post-type";
 import { mergeTokensWithProfile } from "@/lib/modes/tokens";
 import { parseVisualProfile, buildProfileHints } from "@/lib/visual/profile";
 import { prepareProductHero } from "@/lib/product/hero-prep";
@@ -41,6 +42,7 @@ export async function runGenerationForProduct(input: {
   userId: string;
   productId: string;
   modeOrder: [ModeKey, ModeKey, ModeKey];
+  postType?: PostType | null;
 }): Promise<{ runId: string }> {
   const supabase = await createClient();
 
@@ -78,6 +80,7 @@ export async function runGenerationForProduct(input: {
       product_id: product.id,
       status: "processing",
       mode_keys: [...modeTriple],
+      ...(input.postType ? { post_type: input.postType } : {}),
     })
     .select("id")
     .single();

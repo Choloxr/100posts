@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 
+function loginAuthErrorRedirect(origin: string, reason?: string) {
+  const params = new URLSearchParams({ error: "auth" });
+  if (reason) {
+    params.set("reason", reason.slice(0, 400));
+  }
+  return NextResponse.redirect(`${origin}/login?${params.toString()}`);
+}
+
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
@@ -20,6 +28,7 @@ export async function GET(request: Request) {
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
     }
+    return loginAuthErrorRedirect(origin, error.message);
   }
 
   // Fallback path for older code-based callbacks.
@@ -28,7 +37,8 @@ export async function GET(request: Request) {
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
     }
+    return loginAuthErrorRedirect(origin, error.message);
   }
 
-  return NextResponse.redirect(`${origin}/login?error=auth`);
+  return loginAuthErrorRedirect(origin, "missing_token");
 }

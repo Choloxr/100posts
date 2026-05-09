@@ -2,8 +2,9 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { modeLabel, type ModeKey } from "@/lib/modes/catalog";
+import { isPostType, postTypeLabel } from "@/lib/product/post-type";
 import { RunRefresh } from "@/components/run-refresh";
-import { CopyButton } from "@/components/copy-button";
+import { RunResultsView } from "@/components/run-results-view";
 
 type OutputRow = {
   variant_index: number;
@@ -27,7 +28,7 @@ export default async function RunPage({
 
   const { data: run, error: runErr } = await supabase
     .from("generation_runs")
-    .select("id, user_id, status, error_message")
+    .select("id, user_id, status, error_message, product_id, post_type")
     .eq("id", runId)
     .single();
 
@@ -45,8 +46,9 @@ export default async function RunPage({
 
   if (status === "pending" || status === "processing") {
     return (
-      <div className="space-y-4">
-        <h1 className="text-xl font-semibold">Generando</h1>
+      <div className="relative mx-auto max-w-xl space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/90 p-8 backdrop-blur">
+        <h1 className="text-xl font-semibold tracking-tight">Generando tus posts…</h1>
+        <p className="text-sm text-[var(--muted)]">Esto puede tardar un momento.</p>
         <RunRefresh />
       </div>
     );
@@ -54,12 +56,12 @@ export default async function RunPage({
 
   if (status === "error") {
     return (
-      <div className="space-y-4">
+      <div className="relative mx-auto max-w-xl space-y-4 rounded-2xl border border-red-500/25 bg-[var(--surface)]/90 p-8 backdrop-blur">
         <h1 className="text-xl font-semibold">Algo salió mal</h1>
-        <p className="text-sm text-red-500">{run.error_message}</p>
+        <p className="text-sm text-red-400">{run.error_message}</p>
         <Link
           href="/products/new"
-          className="inline-block text-sm font-medium text-[var(--accent)] underline"
+          className="inline-flex rounded-xl bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-fg)]"
         >
           Volver a intentar
         </Link>
@@ -68,6 +70,21 @@ export default async function RunPage({
   }
 
   const rows = (outputs ?? []) as OutputRow[];
+
+  let productName = "Producto";
+  const productId = run.product_id as string | null;
+  if (productId) {
+    const { data: product } = await supabase
+      .from("products")
+      .select("name")
+      .eq("id", productId)
+      .maybeSingle();
+    if (product?.name) productName = String(product.name);
+  }
+
+  const postTypeRaw = run.post_type as string | null | undefined;
+  const postTypeLabelText =
+    postTypeRaw && isPostType(postTypeRaw) ? postTypeLabel(postTypeRaw) : null;
 
   const signed = await Promise.all(
     rows.map(async (out) => {
@@ -79,72 +96,22 @@ export default async function RunPage({
           .createSignedUrl(p, 7200);
         slideUrls.push(data?.signedUrl ?? "");
       }
-      return { out, slideUrls };
+      return {
+        variantIndex: out.variant_index,
+        modeLabel: modeLabel(out.mode_key as ModeKey),
+        caption: out.caption,
+        cta: out.cta,
+        slideUrls,
+      };
     })
   );
 
   return (
-    <div className="space-y-10">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <Link
-            href="/products/new"
-            className="text-xs font-medium text-[var(--muted)] hover:text-[var(--fg)]"
-          >
-            ← Nuevo producto
-          </Link>
-          <h1 className="mt-2 text-2xl font-semibold">Tus 3 posts</h1>
-          <p className="mt-1 text-sm text-[var(--muted)]">
-            Carruseles 4:5, caption y CTA listos para publicar.
-          </p>
-        </div>
-        <a
-          href={`/api/runs/${runId}/zip`}
-          className="inline-flex shrink-0 items-center justify-center rounded-lg bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-fg)] hover:opacity-90"
-        >
-          Descargar ZIP
-        </a>
-      </div>
-
-      <div className="grid gap-10">
-        {signed.map(({ out, slideUrls }, idx) => (
-          <section
-            key={out.variant_index}
-            className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5"
-          >
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-sm font-semibold text-[var(--fg)]">
-                Variante {idx + 1}: {modeLabel(out.mode_key as ModeKey)}
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                <CopyButton text={out.caption} label="Copiar caption" />
-                <CopyButton text={out.cta} label="Copiar CTA" />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {slideUrls.map((url, i) =>
-                url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    key={i}
-                    src={url}
-                    alt={`Slide ${i + 1}`}
-                    className="w-full rounded-lg border border-[var(--border)] object-cover aspect-[4/5]"
-                  />
-                ) : null
-              )}
-            </div>
-            <details className="mt-4 text-sm text-[var(--muted)]">
-              <summary className="cursor-pointer font-medium text-[var(--fg)]">
-                Ver caption
-              </summary>
-              <p className="mt-2 whitespace-pre-wrap text-[var(--fg)]">{out.caption}</p>
-              <p className="mt-2 font-medium text-[var(--fg)]">CTA</p>
-              <p className="text-[var(--muted)]">{out.cta}</p>
-            </details>
-          </section>
-        ))}
-      </div>
-    </div>
+    <RunResultsView
+      runId={runId}
+      productName={productName}
+      postTypeLabel={postTypeLabelText}
+      variants={signed}
+    />
   );
 }

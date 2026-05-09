@@ -2,29 +2,106 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── 100posts Design System ─── Dark-only premium theme ─── */
+
 :root {
-  --bg: #fafafa;
-  --surface: #ffffff;
-  --fg: #0f172a;
-  --muted: #64748b;
-  --muted-bg: #f1f5f9;
-  --border: #e2e8f0;
-  --accent: #4f46e5;
+  --bg: #070B14;
+  --bg2: #0D1320;
+  --sidebar: #0A0F1A;
+  --surface: #121826;
+  --border: #1E2638;
+  --border-strong: rgba(255,255,255,0.12);
+  --hover-surface: #182235;
+  --accent: #7C5CFC;
+  --accent-hover: #9277FF;
+  --accent-glow: rgba(124,92,252,0.25);
   --accent-fg: #ffffff;
+  --fg: #F5F7FA;
+  --muted: #98A2B3;
+  --muted2: #667085;
+  --muted-bg: rgba(255,255,255,0.04);
+  --success: #12B76A;
+  --warning: #F79009;
+  --error: #F04438;
 }
 
+/* Force dark on html for consistency */
 .dark {
-  --bg: #030712;
-  --surface: #0b1220;
-  --fg: #f8fafc;
-  --muted: #94a3b8;
-  --muted-bg: #1e293b;
-  --border: #1e293b;
-  --accent: #6366f1;
-  --accent-fg: #f8fafc;
+  --bg: #070B14;
+  --bg2: #0D1320;
+  --sidebar: #0A0F1A;
+  --surface: #121826;
+  --border: #1E2638;
+  --border-strong: rgba(255,255,255,0.12);
+  --hover-surface: #182235;
+  --accent: #7C5CFC;
+  --accent-hover: #9277FF;
+  --accent-glow: rgba(124,92,252,0.25);
+  --accent-fg: #ffffff;
+  --fg: #F5F7FA;
+  --muted: #98A2B3;
+  --muted2: #667085;
+  --muted-bg: rgba(255,255,255,0.04);
+  --success: #12B76A;
+  --warning: #F79009;
+  --error: #F04438;
 }
 
+/* ─── Base ─── */
 body {
   background: var(--bg);
   color: var(--fg);
+}
+
+*, *::before, *::after {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::selection {
+  background: rgba(124,92,252,0.35);
+  color: #fff;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted2); }
+
+/* ─── Animations ─── */
+@keyframes run-variant-reveal {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.run-variant-pane {
+  animation: run-variant-reveal 0.35s ease-out both;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--surface) 25%, var(--hover-surface) 50%, var(--surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+  border-radius: 8px;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up-enter {
+  animation: fade-up 0.4s ease-out both;
+}
+
+/* ─── Focus ring utility ─── */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-glow);
+  border-color: var(--accent);
 }
